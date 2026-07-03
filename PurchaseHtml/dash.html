@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FreshVeg — Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* ───────── RESET & BASE ───────── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f0f4f0;
+            display: flex;
+            min-height: 100vh;
+            color: #1e2e1e;
+        }
+
+        /* ───────── SIDEBAR ───────── */
+        .sidebar {
+            width: 260px;
+            background: #0e3b0e;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            padding: 28px 20px;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            flex-shrink: 0;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar .logo {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .sidebar .logo i {
+            font-size: 30px;
+            color: #a8e6a8;
+        }
+
+        .sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+        }
+
+        .sidebar nav a {
+            color: #cde8cd;
+            text-decoration: none;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: 0.25s ease;
+        }
+
+        .sidebar nav a i {
+            width: 22px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .sidebar nav a:hover {
+            background: rgba(255, 255, 255, 0.10);
+            color: #fff;
+        }
+
+        .sidebar nav a.active {
+            background: #2b6e2b;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .sidebar .bottom-links {
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            padding-top: 20px;
+        }
+
+        .sidebar .bottom-links a {
+            color: #cde8cd;
+            text-decoration: none;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: 0.25s ease;
+        }
+
+        .sidebar .bottom-links a:hover {
+            background: rgba(255, 255, 255, 0.10);
+            color: #fff;
+        }
+
+        .sidebar .bottom-links a i {
+            width: 22px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        /* ───────── MAIN CONTENT ───────── */
+        .main {
+            flex: 1;
+            padding: 28px 36px 40px;
+            overflow-y: auto;
+        }
+
+        /* ─── TOP BAR ─── */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            padding: 16px 28px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .topbar .greeting h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1e2e1e;
+        }
+
+        .topbar .greeting p {
+            font-size: 14px;
+            color: #6b7a6b;
+            margin-top: 2px;
+        }
+
+        .topbar .right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .topbar .right .search-box {
+            display: flex;
+            align-items: center;
+            background: #f0f4f0;
+            border-radius: 30px;
+            padding: 6px 16px;
+            gap: 10px;
+        }
+
+        .topbar .right .search-box input {
+            border: none;
+            background: transparent;
+            padding: 8px 0;
+            font-size: 14px;
+            outline: none;
+            width: 180px;
+            color: #1e2e1e;
+        }
+
+        .topbar .right .search-box input::placeholder {
+            color: #8a9a8a;
+        }
+
+        .topbar .right .search-box i {
+            color: #6b7a6b;
+        }
+
+        .topbar .right .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #2b6e2b;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(43, 110, 43, 0.3);
+        }
+
+        /* ─── STATS CARDS ─── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 36px;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 22px 24px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            transition: 0.2s ease;
+            border-left: 5px solid #2b6e2b;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card .icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            background: #e8f3e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: #2b6e2b;
+            flex-shrink: 0;
+        }
+
+        .stat-card .info h3 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1e2e1e;
+        }
+
+        .stat-card .info p {
+            font-size: 14px;
+            color: #6b7a6b;
+            font-weight: 500;
+        }
+
+        .stat-card .info .trend {
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 4px;
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 20px;
+            background: #e6f7e6;
+            color: #1f7a1f;
+        }
+
+        .stat-card:nth-child(2) {
+            border-left-color: #e67e22;
+        }
+        .stat-card:nth-child(2) .icon {
+            background: #fdf0e6;
+            color: #e67e22;
+        }
+
+        .stat-card:nth-child(3) {
+            border-left-color: #2980b9;
+        }
+        .stat-card:nth-child(3) .icon {
+            background: #e6f0fa;
+            color: #2980b9;
+        }
+
+        .stat-card:nth-child(4) {
+            border-left-color: #8e44ad;
+        }
+        .stat-card:nth-child(4) .icon {
+            background: #f3e8f8;
+            color: #8e44ad;
+        }
+
+        /* ─── TWO-COLUMN LAYOUT ─── */
+        .row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 28px;
+            margin-bottom: 36px;
+        }
+
+        .panel {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px 26px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .panel .panel-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e2e1e;
+        }
+
+        .panel .panel-header a {
+            color: #2b6e2b;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .panel .panel-header a:hover {
+            text-decoration: underline;
+        }
+
+        /* ─── CHART (bar) ─── */
+        .chart-bars {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            height: 180px;
+            padding-top: 10px;
+            gap: 12px;
+        }
+
+        .chart-bar-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .chart-bar-item .bar {
+            width: 100%;
+            max-width: 40px;
+            border-radius: 6px 6px 0 0;
+            background: linear-gradient(180deg, #2b6e2b, #4caf50);
+            transition: 0.3s ease;
+            min-height: 8px;
+            position: relative;
+        }
+
+        .chart-bar-item .bar:hover {
+            opacity: 0.8;
+            transform: scaleY(1.02);
+            transform-origin: bottom;
+        }
+
+        .chart-bar-item .bar-label {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #6b7a6b;
+            font-weight: 500;
+        }
+
+        .chart-bar-item .bar-value {
+            font-size: 11px;
+            font-weight: 600;
+            color: #1e2e1e;
+            margin-bottom: 4px;
+        }
+
+        /* ─── RECENT ORDERS TABLE ─── */
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .orders-table th {
+            text-align: left;
+            padding: 12px 8px 12px 0;
+            border-bottom: 2px solid #e6ede6;
+            color: #4a5a4a;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .orders-table td {
+            padding: 14px 8px 14px 0;
+            border-bottom: 1px solid #edf3ed;
+            color: #1e2e1e;
+        }
+
+        .orders-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .orders-table .badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-delivered {
+            background: #e6f7e6;
+            color: #1f7a1f;
+        }
+
+        .badge-pending {
+            background: #fef3e6;
+            color: #b86b1f;
+        }
+
+        .badge-shipped {
+            background: #e6f0fa;
+            color: #1a5f8a;
+        }
+
+        .badge-canceled {
+            background: #fde6e6;
+            color: #a13232;
+        }
+
+        /* ─── QUICK ACTIONS ─── */
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .quick-actions .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            background: #f7faf7;
+            border: 1px solid #e6ede6;
+            text-decoration: none;
+            color: #1e2e1e;
+            font-weight: 500;
+            transition: 0.2s ease;
+            font-size: 14px;
+        }
+
+        .quick-actions .action-btn:hover {
+            background: #eaf3ea;
+            border-color: #2b6e2b;
+            transform: translateX(4px);
+        }
+
+        .quick-actions .action-btn i {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: #2b6e2b;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .quick-actions .action-btn:nth-child(2) i {
+            background: #e67e22;
+        }
+        .quick-actions .action-btn:nth-child(3) i {
+            background: #2980b9;
+        }
+        .quick-actions .action-btn:nth-child(4) i {
+            background: #8e44ad;
+        }
+
+        /* ─── PRODUCT LIST (mini) ─── */
+        .product-mini {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 0;
+            border-bottom: 1px solid #edf3ed;
+        }
+
+        .product-mini:last-child {
+            border-bottom: none;
+        }
+
+        .product-mini .thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: #eaf3ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #2b6e2b;
+            flex-shrink: 0;
+        }
+
+        .product-mini .details {
+            flex: 1;
+        }
+
+        .product-mini .details h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e2e1e;
+        }
+
+        .product-mini .details p {
+            font-size: 12px;
+            color: #6b7a6b;
+        }
+
+        .product-mini .price {
+            font-weight: 600;
+            color: #2b6e2b;
+            font-size: 14px;
+        }
+
+        /* ─── FOOTER ─── */
+        .dashboard-footer {
+            text-align: center;
+            padding: 24px 0 8px;
+            color: #8a9a8a;
+            font-size: 13px;
+            border-top: 1px solid #e6ede6;
+            margin-top: 12px;
+        }
+
+        /* ───────── RESPONSIVE ───────── */
+        @media (max-width: 1024px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 80px;
+                padding: 20px 12px;
+            }
+
+            .sidebar .logo {
+                font-size: 20px;
+                justify-content: center;
+            }
+            .sidebar .logo span {
+                display: none;
+            }
+            .sidebar nav a span,
+            .sidebar .bottom-links a span {
+                display: none;
+            }
+            .sidebar nav a,
+            .sidebar .bottom-links a {
+                justify-content: center;
+                padding: 14px;
+            }
+            .sidebar nav a i,
+            .sidebar .bottom-links a i {
+                font-size: 20px;
+                width: auto;
+            }
+
+            .main {
+                padding: 20px 16px;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                padding: 16px 20px;
+            }
+
+            .topbar .right {
+                flex-wrap: wrap;
+                justify-content: space-between;
+            }
+
+            .topbar .right .search-box input {
+                width: 120px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+
+            .stat-card {
+                padding: 16px 18px;
+            }
+            .stat-card .info h3 {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 60px;
+                padding: 14px 8px;
+            }
+            .sidebar .logo {
+                font-size: 16px;
+            }
+            .sidebar .logo i {
+                font-size: 22px;
+            }
+            .sidebar nav a,
+            .sidebar .bottom-links a {
+                padding: 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar .right .search-box input {
+                width: 100px;
+            }
+
+            .panel {
+                padding: 18px 16px;
+            }
+
+            .chart-bars {
+                height: 140px;
+                gap: 8px;
+            }
+            .chart-bar-item .bar {
+                max-width: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════ SIDEBAR ═══════ -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fas fa-leaf"></i>
+            <span>FreshVeg</span>
+        </div>
+
+        <nav>
+            <a href="#" class="active">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#">
+                <i class="fas fa-shopping-bag"></i>
+                <span>Orders</span>
+            </a>
+            <a href="#">
+                <i class="fas fa-carrot"></i>
+                <span>Products</span>
+            </a>
+            <a href="#">
+                <i class="fas fa-users"></i>
+                <span>Customers</span>
+            </a>
+            <a href="#">
+                <i class="fas fa-chart-line"></i>
+                <span>Analytics</span>
+            </a>
+            <a href="#">
+                <i class="fas fa-truck"></i>
+                <span>Delivery</span>
+            </a>
+        </nav>
+
+        <div class="bottom-links">
+            <a href="#">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="#">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ═══════ MAIN ═══════ -->
+    <main class="main">
+
+        <!-- TOP BAR -->
+        <div class="topbar">
+            <div class="greeting">
+                <h2>👋 Good morning, Admin</h2>
+                <p>Here's what's happening with your store today.</p>
+            </div>
+            <div class="right">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search..." />
+                </div>
+                <div class="avatar">A</div>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-shopping-cart"></i></div>
+                <div class="info">
+                    <h3>1,284</h3>
+                    <p>Total Orders</p>
+                    <span class="trend"><i class="fas fa-arrow-up"></i> +12.5%</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-rupee-sign"></i></div>
+                <div class="info">
+                    <h3>₹42.8K</h3>
+                    <p>Revenue</p>
+                    <span class="trend"><i class="fas fa-arrow-up"></i> +8.2%</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-box"></i></div>
+                <div class="info">
+                    <h3>56</h3>
+                    <p>Products</p>
+                    <span class="trend"><i class="fas fa-arrow-up"></i> +3 new</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="icon"><i class="fas fa-user-friends"></i></div>
+                <div class="info">
+                    <h3>342</h3>
+                    <p>Customers</p>
+                    <span class="trend"><i class="fas fa-arrow-up"></i> +18</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW: CHART + QUICK ACTIONS -->
+        <div class="row">
+
+            <!-- CHART -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>📊 Weekly Sales</h3>
+                    <a href="#">View full report →</a>
+                </div>
+                <div class="chart-bars">
+                    <div class="chart-bar-item">
+                        <div class="bar-value">₹8.2K</div>
+                        <div class="bar" style="height:76%;"></div>
+                        <div class="bar-label">Mon</div>
+                    </div>
+                    <div class="chart-bar-item">
+                        <div class="bar-value">₹6.8K</div>
+                        <div class="bar" style="height:62%;"></div>
+                        <div class="bar-label">Tue</div>
+                    </div>
+                    <div class="chart-bar-item">
+                        <div class="bar-value">₹10.4K</div>
+                        <div class="bar" style="height:94%;"></div>
+                        <div class="bar-label">Wed</div>
+                    </div>
+                    <div class="chart-bar-item">
+                        <div class="bar-value">₹7.1K</div>
+                        <div class="bar" style="height:66%;"></div>
+                        <div class="bar-label">Thu</div>
+                    </div>
+                    <div class="chart-bar-item">
+                        <div class="bar-value">₹12.6K</div>
+                        <div class="bar" style="height:100%;"></div>
+                        <div class="bar-label">Fri</div>
+                    </div>
+                    <div class="chart-bar-item">
+                        <div class="bar-value">₹9.8K</div>
+                        <div class="bar" style="height:84%;"></div>
+                        <div class="bar-label">Sat</div>
+                    </div>
+                    <div class="chart-bar-item">
+                        <div class="bar-value">₹5.3K</div>
+                        <div class="bar" style="height:48%;"></div>
+                        <div class="bar-label">Sun</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUICK ACTIONS -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>⚡ Quick Actions</h3>
+                </div>
+                <div class="quick-actions">
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-plus"></i>
+                        Add New Product
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-truck"></i>
+                        Manage Deliveries
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-file-invoice"></i>
+                        View All Orders
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-percent"></i>
+                        Create Offer
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW: RECENT ORDERS + TOP PRODUCTS -->
+        <div class="row">
+
+            <!-- RECENT ORDERS -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>📦 Recent Orders</h3>
+                    <a href="#">View all →</a>
+                </div>
+                <div class="table-wrap">
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order</th>
+                                <th>Customer</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>#1024</strong></td>
+                                <td>Priya Sharma</td>
+                                <td>₹540</td>
+                                <td><span class="badge badge-delivered">Delivered</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>#1023</strong></td>
+                                <td>Arjun Mehta</td>
+                                <td>₹320</td>
+                                <td><span class="badge badge-shipped">Shipped</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>#1022</strong></td>
+                                <td>Neha Patel</td>
+                                <td>₹780</td>
+                                <td><span class="badge badge-pending">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>#1021</strong></td>
+                                <td>Rahul Singh</td>
+                                <td>₹210</td>
+                                <td><span class="badge badge-canceled">Canceled</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>#1020</strong></td>
+                                <td>Ananya Reddy</td>
+                                <td>₹950</td>
+                                <td><span class="badge badge-delivered">Delivered</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TOP PRODUCTS -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>🥕 Top Products</h3>
+                    <a href="#">Manage →</a>
+                </div>
+
+                <div class="product-mini">
+                    <div class="thumb"><i class="fas fa-carrot"></i></div>
+                    <div class="details">
+                        <h4>Carrot</h4>
+                        <p>₹40 / kg · 284 sold</p>
+                    </div>
+                    <div class="price">₹40</div>
+                </div>
+
+                <div class="product-mini">
+                    <div class="thumb"><i class="fas fa-apple-alt"></i></div>
+                    <div class="details">
+                        <h4>Tomato</h4>
+                        <p>₹30 / kg · 212 sold</p>
+                    </div>
+                    <div class="price">₹30</div>
+                </div>
+
+                <div class="product-mini">
+                    <div class="thumb"><i class="fas fa-seedling"></i></div>
+                    <div class="details">
+                        <h4>Potato</h4>
+                        <p>₹35 / kg · 198 sold</p>
+                    </div>
+                    <div class="price">₹35</div>
+                </div>
+
+                <div class="product-mini">
+                    <div class="thumb"><i class="fas fa-pepper"></i></div>
+                    <div class="details">
+                        <h4>Onion</h4>
+                        <p>₹28 / kg · 156 sold</p>
+                    </div>
+                    <div class="price">₹28</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="dashboard-footer">
+            © 2026 FreshVeg · Dashboard v2.0
+        </div>
+
+    </main>
+
+</body>
+</html>
